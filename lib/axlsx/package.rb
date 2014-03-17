@@ -114,7 +114,7 @@ module Axlsx
     def to_stream(confirm_valid=false)
       return false unless !confirm_valid || self.validate.empty?
       Relationship.clear_cached_instances
-      zip = write_parts(Zip::ZipOutputStream.new("streamed", true))
+      zip = write_parts(Zip::OutputStream.new(StringIO.new, true))
       stream = zip.close_buffer
       stream.rewind
       stream
@@ -174,7 +174,7 @@ module Axlsx
     end
 
     # Generate a ZipEntry for the given package part.
-    # The important part here is to explicitly set the timestamp for the zip entry: Serializing axlsx packages 
+    # The important part here is to explicitly set the timestamp for the zip entry: Serializing axlsx packages
     # with identical contents should result in identical zip files – however, the timestamp of a zip entry
     # defaults to the time of serialization and therefore the zip file contents would be different every time
     # the package is serialized.
@@ -188,7 +188,7 @@ module Axlsx
       timestamp = Zip::DOSTime.at(@core.created.to_i)
       Zip::ZipEntry.new("", part[:entry], "", "", 0, 0, Zip::ZipEntry::DEFLATED, 0, timestamp)
     end
-    
+
     # The parts of a package
     # @return [Array] An array of hashes that define the entry, document and schema for each part of the package.
     # @private
